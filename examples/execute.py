@@ -9,7 +9,7 @@ import subprocess
 from os.path import isdir
 from os import makedirs
 
-from fitter.configloader import ConfigLoader,BumpsSetup
+from src.fitter.configloader import ConfigLoader,BumpsSetup
 
 config_file = "example.xlsx"
 model_file = "model.py"
