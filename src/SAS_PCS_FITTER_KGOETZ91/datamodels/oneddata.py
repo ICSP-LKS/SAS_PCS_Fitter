@@ -346,7 +346,7 @@ class BaseOneDDataSet:
                         x = float(data[0])
                         y = float(data[1])
                         e = np.sqrt(y)
-                        if len(data>2):
+                        if len(data)>2:
                             e = float(data[2])
                         xs.append(x)
                         ys.append(y)
@@ -355,6 +355,8 @@ class BaseOneDDataSet:
                         pass
         header = f"#{datetime.datetime.now()}\n"
         header += f"#Data loaded from {filename}\n"
+        if len(xs) == 0 or len(ys)==0:
+            raise ValueError("No data in file.")
         return type(self)(xs,ys,name=name,header=header,error=es)
 
 

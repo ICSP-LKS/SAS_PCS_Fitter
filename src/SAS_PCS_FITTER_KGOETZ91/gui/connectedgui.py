@@ -1,10 +1,10 @@
 import numpy as np
 from SAS_PCS_FITTER_KGOETZ91.gui.generalgui import GeneralGUI
-from SAS_PCS_FITTER_KGOETZ91.gui.popups import DataLoaderWindow
+from SAS_PCS_FITTER_KGOETZ91.gui.dataloader import DataLoaderWindow
 from PySide6.QtCore import Signal
 from PySide6.QtWidgets import QHBoxLayout
 from pyqtgraph import PlotWidget
-
+import pyqtgraph as pg
 class ConnectedGUI(GeneralGUI):
 
     data_updated = Signal()
@@ -12,28 +12,34 @@ class ConnectedGUI(GeneralGUI):
     sans_data = None
     pcs_data = None
 
+    def _update_plot_data(self):
+        if type(self.saxs_data) != type(None):
+            self._saxs_plotter.plot(self.saxs_data.x,self.saxs_data.y)
+        if type(self.sans_data) != type(None):
+            self._sans_plotter.plot(self.sans_data.x,self.sans_data.y)
+        if type(self.pcs_data) != type(None):
+            self._pcs_plotter.plot(self.pcs_data.x,self.pcs_data.y)
+
     def _create_popups(self):
         self.data_loader_window = DataLoaderWindow()
         self.data_loader_window.updated.connect(self._get_data_info)
 
     def _create_plotter(self):
         nulls = np.linspace(0,1000)
-        # self._saxs_plotter = PlotWidget()
-        # self._saxs_layout.addWidget(self._saxs_plotter)
-        # self._widget_list['saxs_tab'].setLayout(self._saxs_layout)
-        # self._saxs_plotter.plot(nulls,nulls)
+        self._saxs_plotter = PlotWidget()
+        self._widget_list['saxs_plot_layout'].addWidget(self._saxs_plotter)
+        self._saxs_plotter.plot(nulls,nulls)
 
-        self._sans_layout = QHBoxLayout()
+
         self._sans_plotter = PlotWidget()
-        self._sans_layout.addWidget(self._sans_plotter)
-        self._widget_list['sans_tab'].setLayout(self._sans_layout)
+        self._widget_list['sans_plot_layout'].addWidget(self._sans_plotter)
         self._sans_plotter.plot(nulls,nulls)
 
-        self._pcs_layout = QHBoxLayout()
         self._pcs_plotter = PlotWidget()
-        self._pcs_layout.addWidget(self._pcs_plotter)
-        self._widget_list['pcs_tab'].setLayout(self._pcs_layout)
+        self._widget_list['pcs_plot_layout'].addWidget(self._pcs_plotter)
         self._pcs_plotter.plot(nulls,nulls)
+
+        self.data_updated.connect(self._update_plot_data)
 
     def _get_data_info(self):
         saxs_data = self.data_loader_window.saxs_data
@@ -62,6 +68,8 @@ class ConnectedGUI(GeneralGUI):
 
     def __init__(self,main_widget):
         super().__init__(main_widget)
+        pg.setConfigOption('background', 'w')
+        pg.setConfigOption('foreground', 'k')
         self._create_popups()
         self._create_plotter()
         self._make_connections()
